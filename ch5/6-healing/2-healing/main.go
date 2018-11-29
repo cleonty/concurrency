@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -24,6 +23,7 @@ func doWorkFn(done <-chan interface{}, intList ...int) (startGoroutineFn, <-chan
 			for {
 			valueLoop:
 				for _, intValue := range intList {
+					log.Printf("next intList value is %d\n", intValue)
 					if intValue < 0 {
 						log.Printf("negative value: %v\n", intValue)
 						return
@@ -31,13 +31,18 @@ func doWorkFn(done <-chan interface{}, intList ...int) (startGoroutineFn, <-chan
 					for {
 						select {
 						case <-pulse:
+							log.Printf("doWork: about to send heartbeat")
 							select {
 							case heartbeat <- struct{}{}:
+								log.Printf("doWork: sent heartbeat")
 							default:
+								log.Printf("doWork: not sent heartbeat")
 							}
 						case intStream <- intValue:
+							log.Printf("doWork: sent intValue %d\n", intValue)
 							continue valueLoop
 						case <-done:
+							log.Printf("doWork: done closed; exiting")
 							return
 						}
 					}
@@ -59,7 +64,7 @@ func main() {
 	doWorkWithSteward := newSteward(1*time.Millisecond, doWork)
 	doWorkWithSteward(done, 1*time.Hour)
 	for intVal := range take(done, intStream, 6) {
-		fmt.Printf("Received: %v\n", intVal)
+		log.Printf("main received: %v\n", intVal)
 	}
 	log.Println("done")
 }

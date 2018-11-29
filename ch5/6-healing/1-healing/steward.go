@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type startGoroutineFn func(cone <-chan interface{}, pulseInterval time.Duration) (heartbeat <-chan interface{})
+type startGoroutineFn func(done <-chan interface{}, pulseInterval time.Duration) (heartbeat <-chan interface{})
 
 func newSteward(timeout time.Duration, startGoroutine startGoroutineFn) startGoroutineFn {
 	return func(done <-chan interface{}, pulseInterval time.Duration) <-chan interface{} {

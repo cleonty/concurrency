@@ -38,7 +38,7 @@ func newSteward(timeout time.Duration, startGoroutine startGoroutineFn) startGor
 						log.Printf("got ward's heartbeat, continue to monitor")
 						continue monitorLoop
 					case <-timeoutSignal:
-						log.Println("steward: ward is unhealthy; restarting")
+						log.Println("steward: I haven't got heatbeat from a ward; it is unhealthy; restarting ward")
 						close(wardDone)
 						startWard()
 						continue monitorLoop
